@@ -4,8 +4,8 @@ import at.krixikraxi.games.util.SnakeConstants;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -54,11 +54,14 @@ public class SnakeAnimation extends AnimationTimer {
         }
         showFoodOnCanvas(food);
         moveSnake();
+        checkDeath();
 
         if(pointList.size() > snakeLength) {
             pointList.remove(0);
         }
-        pointList.add(new SneakPoint(x,y));
+        if(snakeLength > 0) {
+            pointList.add(new SneakPoint(x,y));
+        }
 
         // paint sneak
         graphicsContext.setFill(Color.GREEN);
@@ -102,6 +105,24 @@ public class SnakeAnimation extends AnimationTimer {
         graphicsContext.fillRect(f.getX(), f.getY(), SnakeConstants.CANVAS_SCALE, SnakeConstants.CANVAS_SCALE);
     }
 
+    private void checkDeath() {
+        SneakPoint s = new SneakPoint(x,y);
+        if(pointList.contains(s)) {
+            resetBoard();
+        }
+    }
+
+    private void resetBoard() {
+        graphicsContext.clearRect(0, 0, SnakeConstants.CANVAS_WITH, SnakeConstants.CANVAS_HEIGTH);
+        x = 0;
+        y = 0;
+        xSpeed = 1;
+        ySpeed = 0;
+        snakeLength = 0;
+
+        pointList.clear();
+    }
+
     // todo: check if moving backwards
     public void changeDirection(int xSpeed, int ySpeed) {
         this.xSpeed = xSpeed;
@@ -115,6 +136,24 @@ public class SnakeAnimation extends AnimationTimer {
         public SneakPoint(int x, int y) {
             this.x = x;
             this.y = y;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (obj == this) {
+                return true;
+            }
+            if (obj.getClass() != getClass()) {
+                return false;
+            }
+            SneakPoint rhs = (SneakPoint) obj;
+            return new EqualsBuilder()
+                    .append(this.x, rhs.getX())
+                    .append(this.y, rhs.getY())
+                    .isEquals();
         }
 
         public int getX() {
