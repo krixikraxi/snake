@@ -38,7 +38,7 @@ public class ApplicationSnake extends Application {
         root.getChildren().add(stats);
         primaryStage.setScene(new Scene(root));
 
-        Label points = new Label("Points: ");
+        Label points = new Label();
         stats.getChildren().add(points);
 
         SnakeAnimation snakeAnimation = new SnakeAnimation(graphicsContext, SnakeConstants.SPEED, points);
