@@ -55,10 +55,10 @@ public class SnakeAnimation extends AnimationTimer {
         showFoodOnCanvas(food);
         moveSnake();
 
-        pointList.add(new SneakPoint(x,y));
         if(pointList.size() > snakeLength) {
             pointList.remove(0);
         }
+        pointList.add(new SneakPoint(x,y));
 
         // paint sneak
         graphicsContext.setFill(Color.GREEN);
