@@ -5,6 +5,9 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -21,15 +24,17 @@ public class SnakeAnimation extends AnimationTimer {
     private int y = 0;
     private int xSpeed = 1;
     private int ySpeed = 0;
+    private int snakeLength = 0;
 
-    private Food food = null;
-
+    private List<SneakPoint> pointList;
+    private SneakPoint food = null;
 
     public SnakeAnimation(GraphicsContext graphicsContext, long sleepMs) {
         this.graphicsContext = graphicsContext;
         this.sleepNs = sleepMs * 1000000;
         rand = new Random();
         food = produceFood();
+        pointList = new LinkedList<>();
     }
 
     @Override
@@ -37,7 +42,11 @@ public class SnakeAnimation extends AnimationTimer {
         if ((now - prevTime) < sleepNs) {
             return;
         }
-
+        updateTheField();
+        prevTime = now;
+    }
+    
+    private void updateTheField() {
         graphicsContext.clearRect(0, 0, SnakeConstants.CANVAS_WITH, SnakeConstants.CANVAS_HEIGTH);
 
         if(eat(food)) {
@@ -46,10 +55,17 @@ public class SnakeAnimation extends AnimationTimer {
         showFoodOnCanvas(food);
         moveSnake();
 
+        pointList.add(new SneakPoint(x,y));
+        if(pointList.size() > snakeLength) {
+            pointList.remove(0);
+        }
+
+        // paint sneak
         graphicsContext.setFill(Color.GREEN);
         graphicsContext.fillRect(x, y, SnakeConstants.CANVAS_SCALE, SnakeConstants.CANVAS_SCALE);
-
-        prevTime = now;
+        for (SneakPoint s : pointList) {
+            graphicsContext.fillRect(s.getX(), s.getY(), SnakeConstants.CANVAS_SCALE, SnakeConstants.CANVAS_SCALE);
+        }
     }
 
     private void moveSnake() {
@@ -67,20 +83,21 @@ public class SnakeAnimation extends AnimationTimer {
         }
     }
 
-    private boolean eat(Food f) {
+    private boolean eat(SneakPoint f) {
         if(f.getX() == x && f.getY() == y) {
+            snakeLength++;
             return true;
         }
         return false;
     }
 
-    private Food produceFood() {
+    private SneakPoint produceFood() {
         int row = (int) Math.floor((SnakeConstants.CANVAS_HEIGTH / SnakeConstants.CANVAS_SCALE));
         int col = (int) Math.floor((SnakeConstants.CANVAS_WITH / SnakeConstants.CANVAS_SCALE));
-        return new Food(rand.nextInt(row)*SnakeConstants.CANVAS_SCALE, rand.nextInt(col)*SnakeConstants.CANVAS_SCALE);
+        return new SneakPoint(rand.nextInt(row)*SnakeConstants.CANVAS_SCALE, rand.nextInt(col)*SnakeConstants.CANVAS_SCALE);
     }
 
-    private void showFoodOnCanvas(Food f) {
+    private void showFoodOnCanvas(SneakPoint f) {
         graphicsContext.setFill(Color.RED);
         graphicsContext.fillRect(f.getX(), f.getY(), SnakeConstants.CANVAS_SCALE, SnakeConstants.CANVAS_SCALE);
     }
@@ -91,11 +108,11 @@ public class SnakeAnimation extends AnimationTimer {
         this.ySpeed = ySpeed;
     }
 
-    private class Food {
+    private class SneakPoint {
         private int x;
         private int y;
 
-        public Food (int x, int y) {
+        public SneakPoint(int x, int y) {
             this.x = x;
             this.y = y;
         }
