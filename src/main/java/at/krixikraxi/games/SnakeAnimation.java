@@ -3,6 +3,7 @@ package at.krixikraxi.games;
 import at.krixikraxi.games.util.SnakeConstants;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
@@ -19,6 +20,8 @@ public class SnakeAnimation extends AnimationTimer {
     private Random rand;
     private long sleepNs = 0;
     private long prevTime = 0;
+    private Label stats;
+    private int highScore = 0;
 
     private int x = 0;
     private int y = 0;
@@ -29,12 +32,13 @@ public class SnakeAnimation extends AnimationTimer {
     private List<SneakPoint> pointList;
     private SneakPoint food = null;
 
-    public SnakeAnimation(GraphicsContext graphicsContext, long sleepMs) {
+    public SnakeAnimation(GraphicsContext graphicsContext, long sleepMs, Label label) {
         this.graphicsContext = graphicsContext;
         this.sleepNs = sleepMs * 1000000;
         rand = new Random();
         food = produceFood();
         pointList = new LinkedList<>();
+        this.stats = label;
     }
 
     @Override
@@ -44,6 +48,7 @@ public class SnakeAnimation extends AnimationTimer {
         }
         updateTheField();
         prevTime = now;
+        stats.setText("Points: " + snakeLength + " Highscore: " + highScore);
     }
     
     private void updateTheField() {
@@ -108,6 +113,9 @@ public class SnakeAnimation extends AnimationTimer {
     private void checkDeath() {
         SneakPoint s = new SneakPoint(x,y);
         if(pointList.contains(s)) {
+            if(this.snakeLength > highScore) {
+                this.highScore = snakeLength;
+            }
             resetBoard();
         }
     }
@@ -123,7 +131,6 @@ public class SnakeAnimation extends AnimationTimer {
         pointList.clear();
     }
 
-    // todo: check if moving backwards
     public void changeDirection(int xSpeed, int ySpeed) {
         this.xSpeed = xSpeed;
         this.ySpeed = ySpeed;

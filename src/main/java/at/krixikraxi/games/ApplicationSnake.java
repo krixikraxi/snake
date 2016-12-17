@@ -2,12 +2,14 @@ package at.krixikraxi.games;
 
 import at.krixikraxi.games.util.SnakeConstants;
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -29,11 +31,17 @@ public class ApplicationSnake extends Application {
         canvas.setFocusTraversable(true);
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
-        Group root = new Group();
+        VBox root = new VBox();
+        HBox stats = new HBox();
+        //stats.setStyle("-fx-border-color: black");
         root.getChildren().add(canvas);
+        root.getChildren().add(stats);
         primaryStage.setScene(new Scene(root));
 
-        SnakeAnimation snakeAnimation = new SnakeAnimation(graphicsContext, SnakeConstants.SPEED);
+        Label points = new Label("Points: ");
+        stats.getChildren().add(points);
+
+        SnakeAnimation snakeAnimation = new SnakeAnimation(graphicsContext, SnakeConstants.SPEED, points);
         snakeAnimation.start();
 
         canvas.addEventHandler(KeyEvent.KEY_PRESSED, key -> {
